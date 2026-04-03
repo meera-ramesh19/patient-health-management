@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================================
+         PARENT: Spring Boot Starter Parent
+         ============================================================
+         Think of this as "inheriting" from Spring Boot.
+         Just like a child inherits traits from a parent,
+         your project inherits:
+           - Default dependency versions (so you don't pick wrong ones)
+           - Plugin configurations (so builds just work)
+           - Java version defaults
+
+         Without this, you'd manually specify the version of EVERY
+         library and hope they're all compatible with each other.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/> <!-- Tells Maven to download from the internet, not look locally -->
+    </parent>
+
+    <!-- ============================================================
+         YOUR PROJECT IDENTITY
+         ============================================================
+         groupId    = your organization (like a reverse domain name)
+         artifactId = your project name
+         version    = current version of your app
+         name       = human-readable name
+    -->
+    <groupId>com.labservice</groupId>
+    <artifactId>LabService</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>LabService</name>
+    <description>Healthcare management application with Patient, Doctor, and Admin portals</description>
+
+    <!-- ============================================================
+         PROPERTIES
+         ============================================================
+         Variables you can reuse throughout this file.
+         java.version tells Spring Boot which Java version to compile for.
+    -->
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <!-- ============================================================
+         DEPENDENCIES — Your "shopping list" of libraries
+         ============================================================
+         Each <dependency> is a library that Maven downloads for you.
+         You don't need to find JAR files online — just list them here.
+
+         "starter" = a bundle of related libraries that Spring Boot
+         pre-configures to work together. One starter can pull in
+         10-20 individual libraries behind the scenes.
+    -->
+    <dependencies>
+
+        <!-- ========== SPRING BOOT WEB ==========
+             What it gives you:
+               - Embedded Tomcat web server (no separate install needed)
+               - @RestController, @GetMapping, @PostMapping annotations
+               - Automatic JSON conversion (Java objects ↔ JSON)
+             Without this: you'd have no web server and no way to
+             handle HTTP requests.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- NOTE: No <version> tag needed! The parent provides it. -->
+
+        <!-- ========== SPRING DATA JPA ==========
+             What it gives you:
+               - @Entity annotation (maps classes to database tables)
+               - JpaRepository (free CRUD methods: save, find, delete)
+               - Hibernate ORM (converts Java objects to SQL queries)
+             Without this: you'd write raw SQL for every database operation.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- ========== POSTGRESQL DATABASE ==========
+             What it gives you:
+               - A real, persistent database (data survives restarts)
+               - Production-ready (same database used by major companies)
+               - JDBC driver so Spring Boot can connect to PostgreSQL
+             Why "runtime"? Your code never imports PostgreSQL classes directly.
+             Spring Boot auto-detects it and connects automatically.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+            <!-- scope=runtime means: needed to RUN the app, but not to COMPILE it -->
+        </dependency>
+
+        <!-- ========== H2 DATABASE (for testing) ==========
+             Kept for running unit tests with an in-memory database.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ========== SPRING SECURITY ==========
+             What it gives you:
+               - Login/logout handling
+               - Password hashing (BCrypt)
+               - Role-based access control (PATIENT, DOCTOR, ADMIN)
+               - Protection against common attacks (CSRF, session fixation)
+             Without this: anyone could access any endpoint, passwords
+             stored in plain text.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- ========== VALIDATION ==========
+             What it gives you:
+               - @NotNull, @NotBlank, @Email, @Size annotations
+               - @Valid on controller methods to auto-check input
+             Without this: you'd write manual if-checks for every field.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- ========== JWT (JSON Web Tokens) ==========
+             What it gives you:
+               - Generate tokens after login (like a digital ID badge)
+               - Validate tokens on each request
+               - Store user info (username, role) inside the token
+             This is NOT a Spring starter — it's a third-party library.
+             So we DO need to specify the version.
+        -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ========== GOOGLE OAUTH2 ==========
+             What it gives you:
+               - GoogleIdTokenVerifier: verifies "Sign in with Google" tokens
+               - Confirms the token is real, not expired, and from Google
+               - Extracts user info (email, name) from the token
+             This is Google's official library for server-side token verification.
+        -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+
+        <!-- ========== EMAIL ==========
+             What it gives you:
+               - JavaMailSender: send emails from your app
+               - Used for password reset links, notifications, etc.
+             You configure SMTP settings in application.properties
+             (Gmail, Outlook, or any email provider).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- ========== SWAGGER / OPENAPI ==========
+             What it gives you:
+               - Auto-generated API documentation at /swagger-ui.html
+               - Interactive page where you can test all your endpoints
+               - No code changes needed — it reads your @RestController annotations
+             Think of it as a live user manual for your API.
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+
+        <!-- ========== TESTING ==========
+             What it gives you:
+               - JUnit 5 (write and run tests)
+               - MockMvc (test your API endpoints without a real server)
+               - @MockBean (fake dependencies for isolated testing)
+             scope=test means: only available when running tests,
+             NOT included in the final app.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================================================
+         BUILD PLUGINS
+         ============================================================
+         Plugins run during the build process.
+         spring-boot-maven-plugin lets you:
+           - Run: ./mvnw spring-boot:run
+           - Package: ./mvnw package (creates a runnable JAR)
+    -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
